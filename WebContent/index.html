@@ -1,22 +1,32 @@
 
 <H4>RESAS API URL</H4>
 <input type="text" id="resasArea" placeholder="resasURL" size="100" value ="https://opendata.resas-portal.go.jp/api/v1-rc.1/agriculture/sales/shipValue?cityCode=11362&oldCityCode=03&prefCode=11" />
+<H4>RESAS Mapping field</H4>
+<input type="text" id="mappingfact" placeholder="mappingfact" size="50" value ="CityCode" />
 <H4>RESAS API Key : your own Key</H4>
 <input type="text" id="resaskey" placeholder="resaskey" size="100" value ="XNRwjkiJhI8gSKTlRmird1Qg6rlU4eUc5oDtx0fr"/>
 <H4>ArcGIS Online Feature Layer : your update feature larer URL</H4>
 <input type="text" id="layerArea" placeholder="agolURL" size="100" value ="http://services7.arcgis.com/903opF9LxIC4unCH/arcgis/rest/services/saitamadata/FeatureServer/0"/>
 <H4>Specified RESAS API Data hierarchy</H4>
-<input type="text" id="importField" placeholder="" size="100" value="ex:result/years[0]/data[0]/sales"/>
+<input type="text" id="importField" placeholder="" size="100" value="result/years[0]/data[0]/sales"/>
+<H4>Specified ArcGIS Feature Layer field : unique Field</H4>
+<input type="text" id="uniqField" placeholder="" size="50" value="JCODE"/>
+<H4>Specified ArcGIS Feature Layer field : new Data Filed</H4>
+<input type="text" id="newField" placeholder="" size="50" value="sales"/>
 <br>
 <br>
-<button onclick="send()">put message</button>
+<button onclick="send()">submit</button>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript">
 function send() {
 	var resasString = document.getElementById("resasArea").value;
+	var mappingfact = document.getElementById("mappingfact").value;
 	var keyString = document.getElementById("resaskey").value;
 	var layerString = document.getElementById("layerArea").value;
 	var fieldString = document.getElementById("importField").value;
+	var uniqFieldString = document.getElementById("uniqField").value;
+	var newFieldString = document.getElementById("newField").value;
+
 	if (("" == resasString) || ("" == layerString) ||  ("" == keyString)) {
 		alert("resas or key or layerdata is null");
 		return;
@@ -25,7 +35,13 @@ function send() {
 		fieldString = "none";
 	}
 	$.post("api/putMessage", {
-		"message" : resasString + ";" + keyString + ";" + layerString + ";"+ fieldString
+		"resasurl" : resasString,
+		"mappingfact" : mappingfact,
+		"resaskey" : keyString,
+		"agollayer" : layerString,
+		"hierarchy" : fieldString,
+		"ufield" : uniqFieldString,
+		"nfield" : newFieldString
 	}, function() {
 		alert("posted");
 	})
