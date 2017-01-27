@@ -80,15 +80,15 @@ public class IndexAction {
      * perce for new json
      * */
     public static final String mSeparator = "/";
-//    public static final String mCityCode = "cityCode";
     public static final String mResult = "result";
     public static final String mSuffix = "n";
-
+    static ArrayList<ResasfieldStr> mJsonKeyList;
+    static int nIndex = 0;
 
     @POST
 	@Path("/putMessage")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void put(@FormParam("resasurl") String resasurl,
+	public MyData put(@FormParam("resasurl") String resasurl,
 			@FormParam("mappingfact") String mappingfact,
 			@FormParam("resaskey") String resaskey,
 			@FormParam("agollayer") String agollayer,
@@ -117,6 +117,8 @@ public class IndexAction {
 		mPramMap.put(PramKey_newField, nfield);
 
 		updateData();
+		MyData myData = new MyData();
+		return myData;
 	}
 
 	/**
@@ -186,7 +188,7 @@ public class IndexAction {
 			 if(resasResut.get(mResult).equals(null)){
 				 return false;
 			 }
-	         // TODO ここで"n"を含むものか精査する。
+	         // "n"を含むものか精査する。
 			 if(chkSuffix()){
 				 // pattern1
 				 makeUpdateListLoop(resasResut);
@@ -225,14 +227,6 @@ public class IndexAction {
         return pResasResut.getJSONObject(mResult).getJSONObject(mPramMap.get(PramKey_mappingFact)).toString();
 
     }
-
-
-
-    /**
-     *
-     * */
-    static ArrayList<ResasfieldStr> mJsonKeyList;
-    static int nIndex = 0;
 
     /**
      * suffix check
@@ -324,43 +318,6 @@ public class IndexAction {
         		perseObj = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey).getJSONObject(indexNum);
         	}
         }
-
-//        // 指定のパラメータを解析してデータを取得する
-//        String[] getKey = mPramMap.get(PramKey_importField).split(mSeparator);
-//
-//
-//        for(int i = 0; i < getKey.length ;i++){
-//
-//        	// keyが配列
-//        	if(getKey[i].endsWith("]")){
-//        		// 配列のとき
-//        		String Jsonkey = getKey[i].substring(0, getKey[i].indexOf("["));
-//
-//        		// 数値がnか？
-//        		String suffix = getKey[i].substring(getKey[i].indexOf("[")+1, getKey[i].length()-1);
-//        		if(suffix.equals(mSuffix)){
-//        			// ループできるデータの場合
-//        			// null で速攻返す。
-//        			return lastObj;
-//        		}else{
-//        			// 数値の場合
-//            		int indexNum = Integer.parseInt(suffix);
-//            		perseObj = perseObj.getJSONArray(Jsonkey).getJSONObject(indexNum);
-//        		}
-//        	}else{
-//        		// keyのとき
-//        		if(perseObj == null){
-//            		perseObj = pResasResut.getJSONObject(getKey[i]);
-//        		}else{
-//        			if(i == getKey.length-1){
-//        				// 最後のオブジェクトのとき
-//        				lastObj = perseObj.get(getKey[i]);
-//        			}else{
-//        				perseObj = perseObj.getJSONObject(getKey[i]);
-//        			}
-//        		}
-//        	}
-//        }
         return lastObj;
     }
 
@@ -375,10 +332,9 @@ public class IndexAction {
 
     	// 指定コードの値が必要！
         if(mPolygonList.containsKey(pMappingValue)){
-//            if(mPolygonList.containsKey(resasResult.getJSONObject(i).get(mPramMap.get(PramKey_mappingFact)))){
-            JSONObject jsonobj = mPolygonList.get(mPramMap.get(PramKey_mappingFact));
-
+            JSONObject jsonobj = mPolygonList.get(pMappingValue);
             JSONObject updatejson = new JSONObject();
+
             // 更新するarcgisのfield名の取得
             if(mPattern.matcher(pObject.toString()).find()){
             	// int
@@ -396,49 +352,6 @@ public class IndexAction {
     }
 
     /**
-     * create update list
-     * pattern2data:futurePopration
-     * */
-    static boolean makeUpdateListLoop_cf(JSONObject pObject) throws org.json.JSONException{
-
-        try {
-            JSONArray resasResult =  ((JSONObject)pObject).getJSONArray("cities");
-            for(int i=0 ;i < resasResult.length();i++){
-
-                String citycode = resasResult.getJSONObject(i).get("cityCode").toString();
-                if(mPolygonList.containsKey(citycode)){
-                    JSONObject jsonobj = mPolygonList.get(citycode);
-
-                    JSONObject hogehoge = new JSONObject();
-                    hogehoge.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), resasResult.getJSONObject(i).get(mValue)));
-                    mUpdateList.add(hogehoge);
-                }
-            }
-            System.out.println("update list is ok?");
-//            updateSpotCount();
-
-        } catch (JSONException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        }
-
-
-        // JSONオブジェクトからリストを作成する
-    	JSONArray features = ((JSONObject)pObject).getJSONArray(mFeatures);
-//        JSONArray features = pJsonObject.getJSONArray(mFeatures);
-        System.out.println("Response:" + "hogehoge");
-        mPolygonList = new HashMap<String,JSONObject>();
-        for(int i = 0 ; i < features.length();i++){
-        	// TODO jscode のかわりをいれる
-
-            mPolygonList.put(features.getJSONObject(i).getJSONObject(mAttributes)
-                    .getString("JCODE"), features.getJSONObject(i));
-        }
-        return true;
-
-    }
-
-    /**
      * resas data dispatcher
      * @throws JSONException
      * 指定の値を入力したいとき
@@ -446,11 +359,8 @@ public class IndexAction {
      * */
     static void makeUpdateListLoop(JSONObject pResasResut) throws JSONException{
 
-        // citycode = JCODE
         mUpdateList = new ArrayList<JSONObject>();
         JSONObject perseObj = null;
-//        Object lastObj = null;
-
         JSONObject jsonTmpObj;
 
         // resasFeildStructure から作成したリストで回す。
@@ -458,35 +368,26 @@ public class IndexAction {
 
         	if(mJsonKeyList.get(i).suffix == null){
         		// Keyのみのとき
-//        		if(perseObj == null){
-            		perseObj = pResasResut.getJSONObject(mJsonKeyList.get(i).jsonKey);
-//        		}else{
-//        			// TODO これは回したうえでやる処理
-//        			if(i == mJsonKeyList.size() -1){
-//        				// 最後のオブジェクトのとき
-//        				lastObj = perseObj.get(mJsonKeyList.get(i).jsonKey);
-//        			}else{
-//        				perseObj = perseObj.getJSONObject(mJsonKeyList.get(i).jsonKey);
-//        			}
-//        		}
+        		perseObj = pResasResut.getJSONObject(mJsonKeyList.get(i).jsonKey);
         	}else{
         		// 配列のとき=n;必ず
         		// 要素の数でリストを回す
         		// nのしたには必ず最後の要素があるとするnのパターンは考えない
         		// mJsonKeyList + 1で下の要素を指すことにする
-        		JSONArray resasResult = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey);
-//        		JSONArray resasResult = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey).length();
-                for(int j =0 ;j < resasResult.length();j++){
+        		JSONArray arrayResult = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey);
+                for(int j =0 ;j < arrayResult.length();j++){
 
-                    if(mPolygonList.containsKey(resasResult.getJSONObject(i).get(mPramMap.get(PramKey_mappingFact)))){
-//                        if(mPolygonList.containsKey(mJsonKeyList.get(i+1).jsonKey)){
-                        JSONObject jsonobj = mPolygonList.get(mJsonKeyList.get(i+1).jsonKey);
+                    if(mPolygonList.containsKey(arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString())){
+                    	// citycodeが取得できるはず
+                    	String contedKey = arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString();
+                    	// ポリゴンリストから該当したarcの要素を出す。
+                        JSONObject jsonobj = mPolygonList.get(contedKey);
                         jsonTmpObj = new JSONObject();
-                        jsonTmpObj.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), resasResult.getJSONObject(j).get(mJsonKeyList.get(i+1).jsonKey)));
+                        jsonTmpObj.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), arrayResult.getJSONObject(j).get(mJsonKeyList.get(i+1).jsonKey)));
                         mUpdateList.add(jsonTmpObj);
                     }
                 }
-        		// listへの格納が終わったらloopは抜けちゃう！
+        		// listへの格納が終わったらloopは抜ける
                 return;
         	}
         }

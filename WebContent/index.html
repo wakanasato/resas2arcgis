@@ -2,7 +2,7 @@
 <H4>RESAS API URL</H4>
 <input type="text" id="resasArea" placeholder="resasURL" size="100" value ="https://opendata.resas-portal.go.jp/api/v1-rc.1/agriculture/sales/shipValue?cityCode=11362&oldCityCode=03&prefCode=11" />
 <H4>RESAS Mapping field：RESAS API のデータをマッピングさせたいフィールド名を入力します。</H4>
-<input type="text" id="mappingfact" placeholder="mappingfact" size="50" value ="CityCode" />
+<input type="text" id="mappingfact" placeholder="mappingfact" size="50" value ="cityCode" />
 <H4>RESAS API Key : あなたの RESAS API を使うための Key を入力します。</H4>
 <input type="text" id="resaskey" placeholder="resaskey" size="100" value ="XNRwjkiJhI8gSKTlRmird1Qg6rlU4eUc5oDtx0fr"/>
 <H4>ArcGIS Online Feature Layer : あなたが作成して更新したい feature larer の URL を入力します。</H4>
@@ -16,6 +16,13 @@
 <br>
 <br>
 <button onclick="send()">submit</button>
+<br>
+
+<H4>update result</H4>
+<form id="MyData">
+  <input type="text" name="MyData" value="This is text." />
+</form>
+
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript">
 function send() {
@@ -44,6 +51,8 @@ function send() {
 		"nfield" : newFieldString
 	}, function() {
 		alert("posted");
+		var val = $('#MyData [name=MyData]').val();
+		console.log(val);  // => "This is text."
 	})
 }
 </script>
