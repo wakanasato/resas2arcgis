@@ -1,17 +1,17 @@
 
 <H4>RESAS API URL</H4>
 <input type="text" id="resasArea" placeholder="resasURL" size="100" value ="https://opendata.resas-portal.go.jp/api/v1-rc.1/agriculture/sales/shipValue?cityCode=11362&oldCityCode=03&prefCode=11" />
-<H4>RESAS Mapping field</H4>
+<H4>RESAS Mapping field：RESAS API のデータをマッピングさせたいフィールド名を入力します。</H4>
 <input type="text" id="mappingfact" placeholder="mappingfact" size="50" value ="CityCode" />
-<H4>RESAS API Key : your own Key</H4>
+<H4>RESAS API Key : あなたの RESAS API を使うための Key を入力します。</H4>
 <input type="text" id="resaskey" placeholder="resaskey" size="100" value ="XNRwjkiJhI8gSKTlRmird1Qg6rlU4eUc5oDtx0fr"/>
-<H4>ArcGIS Online Feature Layer : your update feature larer URL</H4>
+<H4>ArcGIS Online Feature Layer : あなたが作成して更新したい feature larer の URL を入力します。</H4>
 <input type="text" id="layerArea" placeholder="agolURL" size="100" value ="http://services7.arcgis.com/903opF9LxIC4unCH/arcgis/rest/services/saitamadata/FeatureServer/0"/>
-<H4>Specified RESAS API Data hierarchy</H4>
+<H4>Specified RESAS API Data hierarchy : 取得したデータについて RESAS API の階層の構成を定義します。</H4>
 <input type="text" id="importField" placeholder="" size="100" value="result/years[0]/data[0]/sales"/>
-<H4>Specified ArcGIS Feature Layer field : unique Field</H4>
+<H4>Specified ArcGIS Feature Layer field : unique Field : ArcGIS feature layer のデータをマッピングさせたいフィールド名を入力します。</H4>
 <input type="text" id="uniqField" placeholder="" size="50" value="JCODE"/>
-<H4>Specified ArcGIS Feature Layer field : new Data Filed</H4>
+<H4>Specified ArcGIS Feature Layer field : new Data Filed : 新しくデータを更新するフィールドを定義します。</H4>
 <input type="text" id="newField" placeholder="" size="50" value="sales"/>
 <br>
 <br>

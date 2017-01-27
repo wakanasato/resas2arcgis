@@ -132,7 +132,7 @@ public class IndexAction {
 		// パラメータに沿ってデータを作成する::指定フィールドの検索処理
 		// agolを更新する
 		if(dataFlg){
-			updateSpotCount(mPramMap.get(PramKey_agolURL));
+			updateAgolLayer(mPramMap.get(PramKey_agolURL));
 		}
 		return true;
 
@@ -186,44 +186,65 @@ public class IndexAction {
 			 if(resasResut.get(mResult).equals(null)){
 				 return false;
 			 }
-			 // data Dispath
-			 if(LoopFlg){
-				 // TODO loopdata
-
+	         // TODO ここで"n"を含むものか精査する。
+			 if(chkSuffix()){
+				 // pattern1
+				 makeUpdateListLoop(resasResut);
 			 }else{
 				 // nomaldata:pattern1
 				 // updateリストの作成
-				 makeUpdateList(dispatchResasData(resasResut));
+				 // pattern2
+				 // mappingfieldの値を取得する
+				 makeUpdateList(dispatchResasData(resasResut),getMappingFieldfact(resasResut));
 			 }
-
 		} catch (org.json.JSONException e) {
 			e.printStackTrace();
 			return false;
 		}
-
     	return true;
     }
 
     /**
-     * data dispatch flg
-     * */
-    static boolean LoopFlg = false;
-
-    /**
-     * resas data dispatcher
+     * 指定されたコードの内容を取得する
+     * resas data or url
      * @throws JSONException
      *
      * */
-    static Object dispatchResasData(JSONObject pResasResut) throws JSONException{
+    public static String getMappingFieldfact(JSONObject pResasResut) throws JSONException{
 
-        // citycode = JCODE
-        mUpdateList = new ArrayList<JSONObject>();
+        // citycodeの取得
+        String resasUrl = mPramMap.get(PramKey_resasURL);
+        // ? までを切って&で配列にして=から最後までの文字列を取得する:cityCode=-&
+        String[] request = resasUrl.substring(resasUrl.indexOf("?")+1, resasUrl.length()).split("&");
+        for(String param : request){
+        	if(param.startsWith(mPramMap.get(PramKey_mappingFact))){
+        		return  param.substring(mPramMap.get(PramKey_mappingFact).length()+1, param.length());
+        	}
+        }
+        // resultのすぐ下にあると決めつける。
+        return pResasResut.getJSONObject(mResult).getJSONObject(mPramMap.get(PramKey_mappingFact)).toString();
 
-        // 指定のパラメータを解析してデータを取得する
+    }
+
+
+
+    /**
+     *
+     * */
+    static ArrayList<ResasfieldStr> mJsonKeyList;
+    static int nIndex = 0;
+
+    /**
+     * suffix check
+     * */
+    static boolean chkSuffix(){
+		boolean loopFlg = false;
+		nIndex = 0;
+
+    	// 配列の添え字チェック(int or n)
+    	// json Key の格納
         String[] getKey = mPramMap.get(PramKey_importField).split(mSeparator);
-
-        JSONObject perseObj = null;
-        Object lastObj = null;
+        mJsonKeyList = new ArrayList<ResasfieldStr>();
 
         for(int i = 0; i < getKey.length ;i++){
 
@@ -231,56 +252,140 @@ public class IndexAction {
         	if(getKey[i].endsWith("]")){
         		// 配列のとき
         		String Jsonkey = getKey[i].substring(0, getKey[i].indexOf("["));
-
-        		// 数値がnか？
         		String suffix = getKey[i].substring(getKey[i].indexOf("[")+1, getKey[i].length()-1);
+        		mJsonKeyList.add(setStr(Jsonkey, suffix));
         		if(suffix.equals(mSuffix)){
         			// ループできるデータの場合
-        			LoopFlg = true;
-        			// null で速攻返す。
-        			return lastObj;
-        		}else{
-        			// 数値の場合
-            		int indexNum = Integer.parseInt(suffix);
-            		perseObj = perseObj.getJSONArray(Jsonkey).getJSONObject(indexNum);
+        			loopFlg = true;
+        			nIndex = i;
         		}
         	}else{
         		// keyのとき
-        		if(perseObj == null){
-            		perseObj = pResasResut.getJSONObject(getKey[i]);
-        		}else{
-        			if(i == getKey.length-1){
-        				// 最後のオブジェクトのとき
-        				lastObj = perseObj.get(getKey[i]);
-        			}else{
-        				perseObj = perseObj.getJSONObject(getKey[i]);
-        			}
-        		}
+        		mJsonKeyList.add(setStr(getKey[i],null));
         	}
         }
+        return loopFlg;
+    }
+
+    /**
+     * 構造体用の内部クラス.
+     *
+     */
+    private static class ResasfieldStr {
+        String jsonKey;
+        String suffix;
+    }
+
+    /**
+     * 構造体に値をセット.
+     * @param pJsonKey
+     * @param pSuffix
+     * @return
+     */
+    public static ResasfieldStr setStr(String pJsonKey, String pSuffix) {
+    	ResasfieldStr str = new ResasfieldStr();
+        str.jsonKey = pJsonKey;
+        str.suffix = pSuffix;
+        return str;
+    }
+
+
+    /**
+     * resas data dispatcher
+     * @throws JSONException
+     * 指定の値を入力したいとき
+     *
+     * */
+    static Object dispatchResasData(JSONObject pResasResut) throws JSONException{
+
+        // citycode = JCODE
+        mUpdateList = new ArrayList<JSONObject>();
+        JSONObject perseObj = null;
+        Object lastObj = null;
+
+        // resasFeildStructure から作成したリストで回す。
+        for(int i = 0; i < mJsonKeyList.size() ;i++ ){
+
+        	if(mJsonKeyList.get(i).suffix == null){
+        		// Keyのみのとき
+        		if(perseObj == null){
+            		perseObj = pResasResut.getJSONObject(mJsonKeyList.get(i).jsonKey);
+        		}else{
+        			if(i == mJsonKeyList.size() -1){
+        				// 最後のオブジェクトのとき
+        				lastObj = perseObj.get(mJsonKeyList.get(i).jsonKey);
+        			}else{
+        				perseObj = perseObj.getJSONObject(mJsonKeyList.get(i).jsonKey);
+        			}
+        		}
+        	}else{
+        		// 配列のとき
+        		int indexNum = Integer.parseInt(mJsonKeyList.get(i).suffix);
+        		perseObj = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey).getJSONObject(indexNum);
+        	}
+        }
+
+//        // 指定のパラメータを解析してデータを取得する
+//        String[] getKey = mPramMap.get(PramKey_importField).split(mSeparator);
+//
+//
+//        for(int i = 0; i < getKey.length ;i++){
+//
+//        	// keyが配列
+//        	if(getKey[i].endsWith("]")){
+//        		// 配列のとき
+//        		String Jsonkey = getKey[i].substring(0, getKey[i].indexOf("["));
+//
+//        		// 数値がnか？
+//        		String suffix = getKey[i].substring(getKey[i].indexOf("[")+1, getKey[i].length()-1);
+//        		if(suffix.equals(mSuffix)){
+//        			// ループできるデータの場合
+//        			// null で速攻返す。
+//        			return lastObj;
+//        		}else{
+//        			// 数値の場合
+//            		int indexNum = Integer.parseInt(suffix);
+//            		perseObj = perseObj.getJSONArray(Jsonkey).getJSONObject(indexNum);
+//        		}
+//        	}else{
+//        		// keyのとき
+//        		if(perseObj == null){
+//            		perseObj = pResasResut.getJSONObject(getKey[i]);
+//        		}else{
+//        			if(i == getKey.length-1){
+//        				// 最後のオブジェクトのとき
+//        				lastObj = perseObj.get(getKey[i]);
+//        			}else{
+//        				perseObj = perseObj.getJSONObject(getKey[i]);
+//        			}
+//        		}
+//        	}
+//        }
         return lastObj;
     }
+
+    static Pattern mPattern = Pattern.compile("[0-9]");
 
     /**
      * create update list
      * pattern1data
      * */
-    static boolean makeUpdateList(Object pObject) throws org.json.JSONException{
+    static boolean makeUpdateList(Object pObject,String pMappingValue) throws org.json.JSONException{
 
-        if(mPolygonList.containsKey(mPramMap.get(PramKey_mappingFact))){
+
+    	// 指定コードの値が必要！
+        if(mPolygonList.containsKey(pMappingValue)){
+//            if(mPolygonList.containsKey(resasResult.getJSONObject(i).get(mPramMap.get(PramKey_mappingFact)))){
             JSONObject jsonobj = mPolygonList.get(mPramMap.get(PramKey_mappingFact));
 
             JSONObject updatejson = new JSONObject();
             // 更新するarcgisのfield名の取得
-            String field = mPramMap.get(PramKey_newField);
-            String regex = "[0-9]";
-            Pattern p = Pattern.compile(regex);
-            if(p.matcher(pObject.toString()).find()){
+            if(mPattern.matcher(pObject.toString()).find()){
             	// int
-                updatejson.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(field, Integer.parseInt(pObject.toString())));
+                updatejson.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), Integer.parseInt(pObject.toString())));
             }else{
             	// String
-                updatejson.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(field, pObject.toString()));
+                updatejson.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), pObject.toString()));
             }
             mUpdateList.add(updatejson);
         }
@@ -294,9 +399,7 @@ public class IndexAction {
      * create update list
      * pattern2data:futurePopration
      * */
-    static boolean makeUpdateListLoop(Object pObject) throws org.json.JSONException{
-
-    	// resultの中身まで入っている
+    static boolean makeUpdateListLoop_cf(JSONObject pObject) throws org.json.JSONException{
 
         try {
             JSONArray resasResult =  ((JSONObject)pObject).getJSONArray("cities");
@@ -336,9 +439,63 @@ public class IndexAction {
     }
 
     /**
+     * resas data dispatcher
+     * @throws JSONException
+     * 指定の値を入力したいとき
+     *
+     * */
+    static void makeUpdateListLoop(JSONObject pResasResut) throws JSONException{
+
+        // citycode = JCODE
+        mUpdateList = new ArrayList<JSONObject>();
+        JSONObject perseObj = null;
+//        Object lastObj = null;
+
+        JSONObject jsonTmpObj;
+
+        // resasFeildStructure から作成したリストで回す。
+        for(int i = 0; i < mJsonKeyList.size() ;i++ ){
+
+        	if(mJsonKeyList.get(i).suffix == null){
+        		// Keyのみのとき
+//        		if(perseObj == null){
+            		perseObj = pResasResut.getJSONObject(mJsonKeyList.get(i).jsonKey);
+//        		}else{
+//        			// TODO これは回したうえでやる処理
+//        			if(i == mJsonKeyList.size() -1){
+//        				// 最後のオブジェクトのとき
+//        				lastObj = perseObj.get(mJsonKeyList.get(i).jsonKey);
+//        			}else{
+//        				perseObj = perseObj.getJSONObject(mJsonKeyList.get(i).jsonKey);
+//        			}
+//        		}
+        	}else{
+        		// 配列のとき=n;必ず
+        		// 要素の数でリストを回す
+        		// nのしたには必ず最後の要素があるとするnのパターンは考えない
+        		// mJsonKeyList + 1で下の要素を指すことにする
+        		JSONArray resasResult = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey);
+//        		JSONArray resasResult = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey).length();
+                for(int j =0 ;j < resasResult.length();j++){
+
+                    if(mPolygonList.containsKey(resasResult.getJSONObject(i).get(mPramMap.get(PramKey_mappingFact)))){
+//                        if(mPolygonList.containsKey(mJsonKeyList.get(i+1).jsonKey)){
+                        JSONObject jsonobj = mPolygonList.get(mJsonKeyList.get(i+1).jsonKey);
+                        jsonTmpObj = new JSONObject();
+                        jsonTmpObj.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), resasResult.getJSONObject(j).get(mJsonKeyList.get(i+1).jsonKey)));
+                        mUpdateList.add(jsonTmpObj);
+                    }
+                }
+        		// listへの格納が終わったらloopは抜けちゃう！
+                return;
+        	}
+        }
+    }
+
+    /**
      * update agol
      * */
-    static boolean  updateSpotCount(String pAgolLayer){
+    static boolean  updateAgolLayer(String pAgolLayer){
 
         // REST CALL
         JSONObject result = getArcGISRequest(pAgolLayer + mApplyEdits,mApplyEditsReq + mUpdateList.toString() );
