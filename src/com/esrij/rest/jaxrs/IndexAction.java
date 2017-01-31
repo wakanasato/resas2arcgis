@@ -72,7 +72,8 @@ public class IndexAction {
 	 * AGOL params
 	 * */
 	public static final String mQuery = "/query";
-	public static final String mAgolQuery = "where=(1=1)&outFields=JCODE,FID&f=json&returnGeometry=false";
+	public static final String mAgolField = "where=(1=1)&outFields=JCODE,FID,";
+	public static final String mAgolQuery = "&f=json&returnGeometry=false";
 	public static final String mApplyEdits = "/applyEdits";
 	public static final String mApplyEditsReq = "f=json&updates=";
 
@@ -116,27 +117,45 @@ public class IndexAction {
 		mPramMap.put(PramKey_uniqField, ufield);
 		mPramMap.put(PramKey_newField, nfield);
 
-		updateData();
-		MyData myData = new MyData();
-		return myData;
+		return updateData();
 	}
 
 	/**
 	 * perse data
 	 * call update task
 	 * */
-	public static boolean updateData(){
+	public static MyData updateData(){
 
+		boolean dataFlg = false;
+		MyData myData = new MyData();
 		// agolのレイヤーを取得する
-		collectionGeometry(mPramMap.get(PramKey_agolURL));
+		dataFlg = collectionGeometry(mPramMap.get(PramKey_agolURL));
+		if(!dataFlg){
+
+			myData.setId(1);
+			myData.setMessage("ArcGIS フィーチャ レイヤーへアクセスできませんでした");
+			return myData;
+		}
 		// resasのデータをcallする
-		boolean dataFlg = getResasData(mPramMap.get(PramKey_resasURL), mPramMap.get(PramKey_resasKey));
+		dataFlg = getResasData(mPramMap.get(PramKey_resasURL), mPramMap.get(PramKey_resasKey));
 		// パラメータに沿ってデータを作成する::指定フィールドの検索処理
 		// agolを更新する
 		if(dataFlg){
-			updateAgolLayer(mPramMap.get(PramKey_agolURL));
+			dataFlg = updateAgolLayer(mPramMap.get(PramKey_agolURL));
+			if(dataFlg){
+				myData.setId(0);
+				myData.setMessage("更新に成功しました");
+				return myData;
+			}else{
+				myData.setId(3);
+				myData.setMessage("更新に失敗しました");
+				return myData;
+			}
+		}else{
+			myData.setId(2);
+			myData.setMessage("RESAS API へアクセスできませんでした");
+			return myData;
 		}
-		return true;
 
 	}
 
@@ -146,7 +165,8 @@ public class IndexAction {
     public static boolean collectionGeometry(String pAgolLayer){
 
     	// String想定 : http://***/0 まで
-        JSONObject result = getArcGISRequest(pAgolLayer + mQuery, mAgolQuery);
+    	// Agolで指定された引数のfieldもoutfieldsに追加する
+        JSONObject result = getArcGISRequest(pAgolLayer + mQuery, mAgolField + mPramMap.get(PramKey_uniqField) + mAgolQuery);
         try {
 			createRecestGeometryList(result);
 		} catch (JSONException e) {
@@ -377,11 +397,19 @@ public class IndexAction {
         		JSONArray arrayResult = perseObj.getJSONArray(mJsonKeyList.get(i).jsonKey);
                 for(int j =0 ;j < arrayResult.length();j++){
 
-                    if(mPolygonList.containsKey(arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString())){
+                	// もし、mappingFieldがPrefCodeならばRESAS から取得できるデータをString2桁に変更する
+                	String mapvalue  = arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString();
+                	if(mPramMap.get(PramKey_mappingFact).equals("prefCode")){
+                		mapvalue = null;
+                		mapvalue = String.format("%02d",Integer.valueOf(arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString()));
+                	}
+
+                    if(mPolygonList.containsKey(mapvalue.toString())){
                     	// citycodeが取得できるはず
-                    	String contedKey = arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString();
+//                    	String contedKey = arrayResult.getJSONObject(j).get(mPramMap.get(PramKey_mappingFact)).toString();
                     	// ポリゴンリストから該当したarcの要素を出す。
-                        JSONObject jsonobj = mPolygonList.get(contedKey);
+                        JSONObject jsonobj = mPolygonList.get(mapvalue);
+//                        JSONObject jsonobj = mPolygonList.get(contedKey);
                         jsonTmpObj = new JSONObject();
                         jsonTmpObj.accumulate(mAttributes, jsonobj.getJSONObject(mAttributes).accumulate(mPramMap.get(PramKey_newField), arrayResult.getJSONObject(j).get(mJsonKeyList.get(i+1).jsonKey)));
                         mUpdateList.add(jsonTmpObj);

@@ -1,58 +1,150 @@
+<!DOCTYPE html>
+<html><!--origin change-->
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="translucent-black">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>resas2arcgis</title>
 
-<H4>RESAS API URL</H4>
-<input type="text" id="resasArea" placeholder="resasURL" size="100" value ="https://opendata.resas-portal.go.jp/api/v1-rc.1/agriculture/sales/shipValue?cityCode=11362&oldCityCode=03&prefCode=11" />
-<H4>RESAS Mapping field：RESAS API のデータをマッピングさせたいフィールド名を入力します。</H4>
-<input type="text" id="mappingfact" placeholder="mappingfact" size="50" value ="cityCode" />
-<H4>RESAS API Key : あなたの RESAS API を使うための Key を入力します。</H4>
-<input type="text" id="resaskey" placeholder="resaskey" size="100" value ="XNRwjkiJhI8gSKTlRmird1Qg6rlU4eUc5oDtx0fr"/>
-<H4>ArcGIS Online Feature Layer : あなたが作成して更新したい feature larer の URL を入力します。</H4>
-<input type="text" id="layerArea" placeholder="agolURL" size="100" value ="http://services7.arcgis.com/903opF9LxIC4unCH/arcgis/rest/services/saitamadata/FeatureServer/0"/>
-<H4>Specified RESAS API Data hierarchy : 取得したデータについて RESAS API の階層の構成を定義します。</H4>
-<input type="text" id="importField" placeholder="" size="100" value="result/years[0]/data[0]/sales"/>
-<H4>Specified ArcGIS Feature Layer field : unique Field : ArcGIS feature layer のデータをマッピングさせたいフィールド名を入力します。</H4>
-<input type="text" id="uniqField" placeholder="" size="50" value="JCODE"/>
-<H4>Specified ArcGIS Feature Layer field : new Data Filed : 新しくデータを更新するフィールドを定義します。</H4>
-<input type="text" id="newField" placeholder="" size="50" value="sales"/>
-<br>
-<br>
-<button onclick="send()">submit</button>
-<br>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-<H4>update result</H4>
-<form id="MyData">
-  <input type="text" name="MyData" value="This is text." />
-</form>
+    <style>
+      p {
+        font-size: 10pt;
+        color: #999;
+      }
+    </style>
+  </head>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script type="text/javascript">
-function send() {
-	var resasString = document.getElementById("resasArea").value;
-	var mappingfact = document.getElementById("mappingfact").value;
-	var keyString = document.getElementById("resaskey").value;
-	var layerString = document.getElementById("layerArea").value;
-	var fieldString = document.getElementById("importField").value;
-	var uniqFieldString = document.getElementById("uniqField").value;
-	var newFieldString = document.getElementById("newField").value;
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+            resas2arcgis
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <h3>RESAS API</h3>
 
-	if (("" == resasString) || ("" == layerString) ||  ("" == keyString)) {
-		alert("resas or key or layerdata is null");
-		return;
-	}
-	if("" == resasString){
-		fieldString = "none";
-	}
-	$.post("api/putMessage", {
-		"resasurl" : resasString,
-		"mappingfact" : mappingfact,
-		"resaskey" : keyString,
-		"agollayer" : layerString,
-		"hierarchy" : fieldString,
-		"ufield" : uniqFieldString,
-		"nfield" : newFieldString
-	}, function() {
-		alert("posted");
-		var val = $('#MyData [name=MyData]').val();
-		console.log(val);  // => "This is text."
-	})
-}
-</script>
+          <label for="basic-url">RESAS API URL</label>
+          <div class="input-group">
+            <span class="input-group-addon" id="resasArea-prefix">https://opendata.resas-portal.go.jp/api/v1-rc.1/</span>
+            <input type="text" class="form-control" id="resasArea" aria-describedby="resasArea-prefix" value="population/future/cities?year=2040&prefCode=11">
+          </div>
+          <p></p>
+
+          <label for="basic-url">RESAS API Key</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="resaskey" size="100" value="XNRwjkiJhI8gSKTlRmird1Qg6rlU4eUc5oDtx0fr">
+          </div>
+          <p>あなたの RESAS API を使うための Key を入力します。</p>
+
+          <label for="basic-url">RESAS Mapping field</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="mappingfact" value ="cityCode">
+          </div>
+          <p>RESAS API のデータをマッピングさせたいフィールド名を入力します。</p>
+
+          <label for="basic-url">Specified RESAS API Data hierarchy</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="importField" size="100" value="result/cities[n]/value">
+          </div>
+          <p>取得したデータについて RESAS API の階層の構成を定義します。</p>
+
+          <h3>ArcGIS API</h3>
+
+          <label for="basic-url">ArcGIS Feature Layer URL</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="layerArea" size="100" value="http://services7.arcgis.com/903opF9LxIC4unCH/arcgis/rest/services/%E7%BE%A4%E9%A6%AC%E7%9C%8Cpolygon/FeatureServer/0">
+          </div>
+          <p>あなたが作成して更新したいフィーチャ レイヤーの URL を入力します。</p>
+
+          <label for="basic-url">Specified ArcGIS Feature Layer field : unique Field</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="uniqField" size="50" value="JCODE">
+          </div>
+          <p>RESAS Mapping field の値を使ってマッピングするフィールド名を入力します。</p>
+
+          <label for="basic-url">Specified ArcGIS Feature Layer field : new Data Filed</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="newField" size="50" value="value">
+          </div>
+          <p>新しくデータを更新するフィールドを定義します。</p>
+
+          <button type="button" class="btn btn-success" onclick="send()">転送</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"></h4>
+          </div>
+          <div class="modal-body">
+            <p id="msg">...</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+      function send() {
+        var resasString = document.getElementById("resasArea-prefix").innerText + document.getElementById("resasArea").value;
+        var mappingfact = document.getElementById("mappingfact").value;
+        var keyString = document.getElementById("resaskey").value;
+        var layerString = document.getElementById("layerArea").value;
+        var fieldString = document.getElementById("importField").value;
+        var uniqFieldString = document.getElementById("uniqField").value;
+        var newFieldString = document.getElementById("newField").value;
+
+        if (("" == resasString) || ("" == layerString) ||  ("" == keyString)) {
+          //alert("resas or key or layerdata is null");
+          showMessage("resas or key or layerdata is null");
+          return;
+        }
+        if("" == resasString){
+          fieldString = "none";
+        }
+        $.post("api/putMessage", {
+          "resasurl" : resasString,
+          "mappingfact" : mappingfact,
+          "resaskey" : keyString,
+          "agollayer" : layerString,
+          "hierarchy" : fieldString,
+          "ufield" : uniqFieldString,
+          "nfield" : newFieldString
+        }, function(res) {
+          //alert("posted");
+
+          console.log(res);  // => "This is text."
+
+          showMessage(res.message);
+        })
+      }
+
+      function showMessage(msg) {
+        $('#msg').text(msg);
+        $('#modal').modal('show');
+      }
+
+      $('#modal').modal('hide');
+    </script>
+  </body>
+
+</html>
