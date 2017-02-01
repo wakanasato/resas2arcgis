@@ -71,7 +71,7 @@
   *	RESAS API Data hierarchy：RESAS API のデータ取得結果の階層を入力します。
   *	ArcGIS Feature Layer：ArcGIS フィーチャ レイヤーの URL を入力します。
   *	ArcGIS Unique Field：ArcGIS と RESAS API に共通値がある ArcGIS フィーチャ レイヤーのフィールド名を入力します。
-  *	ArcGIS New Data Filed：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
+  *	ArcGIS New Data Field：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
 
 
  1.	実行
