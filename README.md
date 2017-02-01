@@ -67,8 +67,8 @@
 
   * RESAS API URL：RESAS API のURLを指定します。
   *	RESAS API Key：RESAS API を使用するためのKey (個人で取得)を入力します。
-  *	RESAS Mapping field：ArcGIS と RESAS API に共通値がある RESAS API データのフィールド名を入力します。
-  *	RESAS API Data hierarchy：RESAS API のデータ取得結果の階層を入力します。
+  *	RESAS Mapping Field：ArcGIS と RESAS API に共通値がある RESAS API データのフィールド名を入力します。
+  *	RESAS API Data Hierarchy：RESAS API のデータ取得結果の階層を入力します。
   *	ArcGIS Feature Layer：ArcGIS フィーチャ レイヤーの URL を入力します。
   *	ArcGIS Unique Field：ArcGIS と RESAS API に共通値がある ArcGIS フィーチャ レイヤーのフィールド名を入力します。
   *	ArcGIS New Data Field：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
