@@ -1,6 +1,7 @@
 ﻿##resas2arcgis
  
  このサービスは [RESAS API](https://opendata.resas-portal.go.jp/) から取得できるデータを ArcGIS へ簡単に入力できるようにした開発したサービスです。<br>
+  <img src="http://apps.esrij.com/arcgis-dev/github/img/resas2arcgis.png" >
  
  * RESAS API とは？<br>
  内閣官房（まち・ひと・しごと創生本部事務局）が地方創生の実現に向けて、地域に紐付いた官民ビッグデータ（産業、人口、観光、農業等）を分かりやすく「見える化」したシステムです。
@@ -11,7 +12,7 @@
  1.	[ArcGIS Open Data 全国市区町村界データ](http://arcg.is/2iTeKD9) ： RESAS API データを追加するためのデータ取得
  1.	[ArcGIS Online](https://www.arcgis.com/home/)    ： Web マップを作成します
  1.	[RESAS API 仕様書](https://opendata.resas-portal.go.jp/docs/api/v1/index.html)    ： データの取得方法など定義しています
- 1.	[resas2arcgis](https://resas2arcgis.herokuapp.com)   ： これでデータ追加します☆
+ 1.	[resas2arcgis](https://resas2arcgis.herokuapp.com)   ： データ追加します☆
  
 ##resas2arcgis を使ってみようハンズオン
 
@@ -65,12 +66,12 @@
  RESAS API のデータをArcGIS の指定のフィーチャ レイヤーに入力するために、以下のパラメータを入力します。
 
   * RESAS API URL：RESAS API のURLを指定します。
-  *	RESAS Mapping field：ArcGIS と RESAS API に共通値がある RESAS API データのフィールド名を入力します。
   *	RESAS API Key：RESAS API を使用するためのKey (個人で取得)を入力します。
-  *	ArcGIS Online Feature Layer：ArcGIS フィーチャ レイヤーの URL を入力します。
-  *	Specified RESAS API Data hierarchy：RESAS API のデータ取得結果の階層を入力します。
-  *	Specified ArcGIS Feature Layer field：unique Field：ArcGIS と RESAS API に共通値がある ArcGIS フィーチャ レイヤーのフィールド名を入力します。
-  *	Specified ArcGIS Feature Layer field：new Data Filed：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
+  *	RESAS Mapping field：ArcGIS と RESAS API に共通値がある RESAS API データのフィールド名を入力します。
+  *	RESAS API Data hierarchy：RESAS API のデータ取得結果の階層を入力します。
+  *	ArcGIS Feature Layer：ArcGIS フィーチャ レイヤーの URL を入力します。
+  *	ArcGIS Unique Field：ArcGIS と RESAS API に共通値がある ArcGIS フィーチャ レイヤーのフィールド名を入力します。
+  *	ArcGIS New Data Filed：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
 
 
  1.	実行
