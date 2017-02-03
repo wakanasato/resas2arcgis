@@ -102,7 +102,6 @@
   1. 自身の ArcGIS for Developers サイトに取得したデータをホスト
   1. ホストしたデータの設定（RESAS データ入力用フィールドの作成と編集有効化）
   1. resas2arcgis のパラメーター入力項目の取得（RESAS API/ArcGIS REST API）
-  詳細は下記の
  
  * ページ リンク
  
