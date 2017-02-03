@@ -75,7 +75,7 @@ public class IndexAction {
     static int nIndex = 0;
 
     @POST
-	@Path("/uploadarc")
+	@Path("/uploadarcgis")
 	@Produces(MediaType.APPLICATION_JSON)
 	public MyData put(@FormParam("resasurl") String resasurl,
 			@FormParam("mappingfact") String mappingfact,
@@ -107,6 +107,7 @@ public class IndexAction {
 
 		return updateData();
 	}
+
 
 	/**
 	 * perse data
