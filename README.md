@@ -89,7 +89,7 @@
 * Example (curl)
 
    ```
-     $ curl -d resasurl="https://opendata.resas-portal.go.jp/api/v1/municipality/company/perYear?cityCode=${cityCode}&simcCode=20&prefCode=11&sicCode=E" -d mappingfact="cityCode" -d resaskey={REPLACE WITH YOUR API KEY} -d agollayer="https://services1.arcgis.com/RVzd6I1g6h9fqyZM/arcgis/rest/services/saitama-ken/FeatureServer/0" -d hierarchy="result/data[2]/value" -d ufield="JCODE" -d nfield="num_company20" "https://resas2arcgis.herokuapp.com/api/putMessage"
+     $ curl -F resasurl="https://opendata.resas-portal.go.jp/api/v1/municipality/company/perYear?cityCode=11362&simcCode=20&prefCode=11&sicCode=E" -F mappingfact="cityCode" -F resaskey={REPLACE WITH YOUR API KEY} -F agollayer="https://services1.arcgis.com/RVzd6I1g6h9fqyZM/arcgis/rest/services/saitama-ken/FeatureServer/0" -F hierarchy="result/data[2]/value" -F ufield="JCODE" -F nfield="num_company20" "https://resas2arcgis.herokuapp.com/api/putMessage"
    ```
 
 ## resas2arcgis によるデータ入力処理前に必要なワークフロー
