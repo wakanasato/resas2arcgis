@@ -36,14 +36,14 @@
 
           <label for="basic-url">RESAS API URL</label>
           <div class="input-group">
-            <span class="input-group-addon" id="resasArea-prefix">https://opendata.resas-portal.go.jp/api/v1-rc.1/</span>
-            <input type="text" class="form-control" id="resasArea" aria-describedby="resasArea-prefix" value="population/future/cities?year=2040&prefCode=11">
+            <span class="input-group-addon" id="resasArea-prefix">https://opendata.resas-portal.go.jp/</span>
+            <input type="text" class="form-control" id="resasArea" aria-describedby="resasArea-prefix" value="api/v1-rc.1/…">
           </div>
           <p></p>
 
           <label for="basic-url">RESAS API Key</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="resaskey" size="100" value="XNRwjkiJhI8gSKTlRmird1Qg6rlU4eUc5oDtx0fr">
+            <input type="text" class="form-control" id="resaskey" size="100" value="your own resas api key here!">
           </div>
           <p>あなたの RESAS API を使うための Key を入力します。</p>
 
@@ -55,7 +55,7 @@
 
           <label for="basic-url">RESAS API Data Hierarchy</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="importField" size="100" value="result/cities[n]/value">
+            <input type="text" class="form-control" id="importField" size="100" value="ex:result/data[2]/value">
           </div>
           <p>取得したデータについて RESAS API の階層の構成を定義します。</p>
 
@@ -63,7 +63,7 @@
 
           <label for="basic-url">ArcGIS Feature Layer URL</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="layerArea" size="100" value="http://services7.arcgis.com/903opF9LxIC4unCH/arcgis/rest/services/%E7%BE%A4%E9%A6%AC%E7%9C%8Cpolygon/FeatureServer/0">
+            <input type="text" class="form-control" id="layerArea" size="100" value="http://services7.arcgis.com/903opF9LxIC4unCH/arcgis/rest/services/%E5%85%A8%E5%9B%BD%E5%B8%82%E5%8C%BA%E7%94%BA%E6%9D%91%E7%95%8C%E3%83%87%E3%83%BC%E3%82%BF_%E5%85%B5%E5%BA%AB%E7%9C%8C/FeatureServer/0">
           </div>
           <p>あなたが作成して更新したいフィーチャ レイヤーの URL を入力します。</p>
 
@@ -75,7 +75,7 @@
 
           <label for="basic-url">ArcGIS New Data Field</label>
           <div class="input-group">
-            <input type="text" class="form-control" id="newField" size="50" value="value_fp">
+            <input type="text" class="form-control" id="newField" size="50" value="new_field">
           </div>
           <p>新しくデータを更新するフィールドを定義します。</p>
 
@@ -121,7 +121,7 @@
         if("" == resasString){
           fieldString = "none";
         }
-        $.post("api/putMessage", {
+        $.post("api/uploadarc", {
           "resasurl" : resasString,
           "mappingfact" : mappingfact,
           "resaskey" : keyString,
