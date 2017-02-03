@@ -6,6 +6,12 @@
  * RESAS API とは？<br>
  内閣官房（まち・ひと・しごと創生本部事務局）が地方創生の実現に向けて、地域に紐付いた官民ビッグデータ（産業、人口、観光、農業等）を分かりやすく「見える化」したシステムです。
 
+##Index
+ 
+ * [サービス使用時に必要なURL](#サービス使用時に必要なurl)
+ * [resas2arcgis を使ってみようハンズオン](#resas2arcgis-を使ってみようハンズオン)
+ * [RESTを使った再帰的呼び出し方法(API仕様)](#restを使った再帰的呼び出し方法(api仕様))
+
 ##サービス使用時に必要なURL
 
  1.	[ArcGIS Developers](https://developers.arcgis.com/)    ： 開発者アカウントの作成
@@ -67,11 +73,11 @@
 
   * RESAS API URL：RESAS API のURLを指定します。
   *	RESAS API Key：RESAS API を使用するためのKey (個人で取得)を入力します。
-  *	RESAS Mapping Field：ArcGIS と RESAS API に共通値がある RESAS API データのフィールド名を入力します。
-  *	RESAS API Data Hierarchy：RESAS API のデータ取得結果の階層を入力します。
+  *	RESAS Mapping field：ArcGIS と RESAS API に共通値がある RESAS API データのフィールド名を入力します。
+  *	RESAS API Data hierarchy：RESAS API のデータ取得結果の階層を入力します。
   *	ArcGIS Feature Layer：ArcGIS フィーチャ レイヤーの URL を入力します。
   *	ArcGIS Unique Field：ArcGIS と RESAS API に共通値がある ArcGIS フィーチャ レイヤーのフィールド名を入力します。
-  *	ArcGIS New Data Field：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
+  *	ArcGIS New Data Filed：ArcGIS フィーチャ レイヤーで新たに更新したいフィールドを指定します。
 
 
  1.	実行
@@ -88,4 +94,41 @@
   参考ページ：<br>
   [ArcGIS Online 上のデータを可視化するための方法](http://bit.ly/2jnqSZi)<br>
   [データ可視化のワークフロー](http://bit.ly/2k6EI2Y)
+
+##REST を使った再帰的呼び出し方法(API仕様)
+ 
+ resas2arcgis も REST で処理が実行されます。よってプログラミングに明るい方でしたら、下記の仕様で処理を実行することが可能です。
+ 
+ * Request
+   ```java
+   POST https://resas2arcgis.herokuapp.com/api/uploadarc
+   ```
+
+ * Parameters
+ 
+ |header|項目名称|
+ |:--:|:--:|
+ |resasurl|RESAS API URL|
+ |mappingfact|RESAS API Key|
+ |resaskey|RESAS Mapping Field|
+ |agollayer|RESAS API Data Hierarchy|
+ |hierarchy|ArcGIS Feature Layer|
+ |ufield|ArcGIS Unique Field|
+ |nfield|ArcGIS New Data Field|
+ 
+ * Example(curl or JS?)
+
+   ```java
+   (function(){
+   var xhr = new XMLHttpRequest();
+   xhr.onreadystatechange = function(){
+       if (this.readyState==4 && this.status==200) {
+           // responseをhogehogeする
+       }
+   };
+   xhr.responseType = 'json';
+   xhr.open('GET',endpoint,true);
+   xhr.send();
+   })();
+   ```
 
